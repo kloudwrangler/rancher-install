@@ -1,0 +1,67 @@
+defaultNamespace: harbor
+helm:
+  releaseName: harbor
+  chart: harbor
+  repo: https://helm.goharbor.io
+  version: 1.13.1
+  values:
+    nameOverride: harbor
+    fullnameOverride: harbor
+    existingSecretAdminPassword: pli-harbor-admin
+    existingSecretAdminPasswordKey: HARBOR_ADMIN_PASSWORD
+    # key in pli-harbor-secret-key must be "secretKey"
+    existingSecretSecretKey: pli-harbor-secret-key
+    externalURL: https://harbor.pli.ie
+#    proxy:
+#      httpProxy:
+#      httpsProxy:
+#      noProxy: 127.0.0.1,localhost,.local,.internal
+#      components: core, jobservice, trivy
+    expose:
+      type: ingress
+      tls:
+        enabled: false
+      ingress:
+        className: traefik
+        hosts:
+          core: harbor.127-0-0-1.nip.io
+      clusterIP:
+        name: harbor
+        ports:
+          httpPort: 80
+          httpsPort: 443
+    persistence:
+      enabled: true
+      persistentVolumeClaim:
+        registry:
+          size:
+        jobservice:
+          jobLog:
+            size:
+        database:
+          size:
+        redis:
+          size:
+        trivy:
+          size:
+    portal:
+      replicas: 1
+    core:
+      replicas: 1
+    adminserver:
+      replicas: 1
+    jobservice:
+      replicas: 1
+      maxJobWorkers: 10
+      jobLogger: stdout
+    registry:
+      replicas: 1
+    clair:
+      enabled: true
+      replicas: 1
+      updatersInterval: 12
+    notary:
+      enabled: false
+    database:
+      internal:
+        password: nBX0nd6Q2KsjBivv
